@@ -116,7 +116,8 @@ export const Login: React.FC = () => {
   const handleGoogleLogin = () => {
     const roleParam = searchParams.get('role') || 'CUSTOMER';
     const redirectParam = searchParams.get('redirect') || '';
-    window.location.href = `http://localhost:5000/api/auth/google?role=${roleParam}&redirect=${encodeURIComponent(redirectParam)}`;
+    const baseUrl = import.meta.env.VITE_API_URL?.replace(/\/api.*$/, '') || 'https://houseboat-backend.onrender.com';
+    window.location.href = `${baseUrl}/api/auth/google?role=${roleParam}&redirect=${encodeURIComponent(redirectParam)}`;
   };
 
   const roleParam = searchParams.get('role') || 'CUSTOMER';
