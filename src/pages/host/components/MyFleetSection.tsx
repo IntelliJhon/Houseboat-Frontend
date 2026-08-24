@@ -66,19 +66,19 @@ export const MyFleetSection: React.FC<MyFleetSectionProps> = ({
     setActiveDropdownId(null);
   };
 
-  // Dynamic Pause / Resume listing toggle
+  // Dynamic Pause / Activate listing toggle
   const handlePauseListing = async (boat: Houseboat) => {
-    const isPaused = boat.status === 'Inactive' || boat.status === 'Paused' || boat.todayStatus === 'Blocked' || (boat as any).isPaused;
+    const isPaused = boat.status === 'Inactive' || boat.status === 'Paused' || boat.status === 'Suspended' || boat.todayStatus === 'Blocked' || (boat as any).isPaused;
     const nextStatus = isPaused ? 'Approved' : 'Inactive';
     const nextTodayStatus = isPaused ? 'Available' : 'Blocked';
 
-    const toastId = toast.loading(`${isPaused ? 'Resuming' : 'Pausing'} listing...`);
+    const toastId = toast.loading(`${isPaused ? 'Activating' : 'Pausing'} listing...`);
 
     try {
       if (boat.id && !boat.id.startsWith('HB-')) {
         await api.patch(`/v1/host/listings/${boat.id}/pause`, {
           isPaused: !isPaused,
-          status: isPaused ? 'APPROVED' : 'PAUSED'
+          status: isPaused ? 'APPROVED' : 'SUSPENDED'
         }).catch(() => null);
       }
 
@@ -99,7 +99,7 @@ export const MyFleetSection: React.FC<MyFleetSectionProps> = ({
       toast.dismiss(toastId);
       toast.success(
         isPaused 
-          ? `Listing resumed! ${boat.name} is now Available.` 
+          ? `Listing activated! ${boat.name} is now Approved & Available.` 
           : `Listing paused! ${boat.name} is now Paused/Inactive.`
       );
     } catch (err) {
@@ -484,9 +484,9 @@ export const MyFleetSection: React.FC<MyFleetSectionProps> = ({
                       <button 
                         type="button"
                         onClick={() => handlePauseListing(boat)}
-                        className="w-full px-3 py-1.5 text-left hover:bg-slate-50 flex items-center gap-1.5 cursor-pointer text-amber-600 font-bold"
+                        className="w-full px-3 py-1.5 text-left hover:bg-slate-50 flex items-center gap-1.5 cursor-pointer text-emerald-600 font-bold"
                       >
-                        {boat.status === 'Inactive' || boat.status === 'Paused' || boat.todayStatus === 'Blocked' || (boat as any).isPaused ? 'Resume Listing' : 'Pause Listing'}
+                        {boat.status === 'Inactive' || boat.status === 'Paused' || boat.status === 'Suspended' || boat.todayStatus === 'Blocked' || (boat as any).isPaused ? 'Activate Listing' : 'Pause Listing'}
                       </button>
                       <hr className="border-slate-100 my-1" />
                       <button 
