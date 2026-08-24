@@ -21,7 +21,7 @@ export interface Houseboat {
   name: string;
   description?: string;
   category: 'Luxury' | 'Premium' | 'Deluxe';
-  status: 'Published' | 'Draft' | 'Maintenance' | 'Inactive' | 'Pending Approval' | 'Approved' | 'Rejected' | 'Under Review' | 'Suspended';
+  status: 'Published' | 'Draft' | 'Maintenance' | 'Inactive' | 'Pending Approval' | 'Approved' | 'Rejected' | 'Under Review' | 'Suspended' | 'Paused';
   bedrooms: number;
   bathrooms?: number;
   capacity: number;
@@ -102,6 +102,7 @@ const HostDashboard: React.FC = () => {
           if (dbBoat.status === 'REJECTED') displayStatus = 'Rejected';
           if (dbBoat.status === 'UNDER_REVIEW') displayStatus = 'Under Review';
           if (dbBoat.status === 'SUSPENDED') displayStatus = 'Suspended';
+          if (dbBoat.status === 'PAUSED' || dbBoat.status === 'INACTIVE' || dbBoat.isPaused || dbBoat.status === 'Inactive') displayStatus = 'Inactive';
 
           // Calculate dynamic occupancy & revenue for this specific houseboat
           const boatBookings = hostBookings.filter((b) => 
@@ -145,11 +146,13 @@ const HostDashboard: React.FC = () => {
             return todayStr >= checkInStr && todayStr <= checkOutStr;
           });
 
+          const isPausedListing = dbBoat.status === 'PAUSED' || dbBoat.status === 'INACTIVE' || dbBoat.isPaused || dbBoat.status === 'Inactive';
+
           return {
             id: dbBoat.id,
             name: dbBoat.name,
             category: dbBoat.category || 'Premium',
-            status: displayStatus,
+            status: isPausedListing ? 'Inactive' : displayStatus,
             bedrooms: dbBoat.bedrooms,
             bathrooms: dbBoat.bathrooms || dbBoat.bedrooms,
             capacity: dbBoat.capacity,
@@ -157,7 +160,7 @@ const HostDashboard: React.FC = () => {
             pricePerNight: dbBoat.pricePerNight,
             location: dbBoat.location || 'Alleppey',
             rating: dbBoat.averageRating || 4.8,
-            todayStatus: isOnTripToday ? 'On Trip' : 'Available',
+            todayStatus: isPausedListing ? 'Blocked' : (isOnTripToday ? 'On Trip' : 'Available'),
             monthlyOccupancy: finalOccupancy,
             monthlyRevenue: finalRevenue,
             upcomingTripDate: boatBookings.length > 0 ? new Date(boatBookings[0].checkInDate).toLocaleDateString('en-US', { month: 'short', day: 'numeric' }) : 'None',

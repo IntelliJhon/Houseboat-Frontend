@@ -66,19 +66,48 @@ export const MyFleetSection: React.FC<MyFleetSectionProps> = ({
     setActiveDropdownId(null);
   };
 
-  // Pause listing toggle
-  const handlePauseListing = (id: string) => {
-    setFleet(prev => 
-      prev.map(b => {
-        if (b.id === id) {
-          const nextStatus = b.status === 'Inactive' ? 'Published' : 'Inactive';
-          toast.success(`Vessel status set to ${nextStatus}`);
-          return { ...b, status: nextStatus };
-        }
-        return b;
-      })
-    );
-    setActiveDropdownId(null);
+  // Dynamic Pause / Resume listing toggle
+  const handlePauseListing = async (boat: Houseboat) => {
+    const isPaused = boat.status === 'Inactive' || boat.status === 'Paused' || boat.todayStatus === 'Blocked' || (boat as any).isPaused;
+    const nextStatus = isPaused ? 'Approved' : 'Inactive';
+    const nextTodayStatus = isPaused ? 'Available' : 'Blocked';
+
+    const toastId = toast.loading(`${isPaused ? 'Resuming' : 'Pausing'} listing...`);
+
+    try {
+      if (boat.id && !boat.id.startsWith('HB-')) {
+        await api.patch(`/v1/host/listings/${boat.id}/pause`, {
+          isPaused: !isPaused,
+          status: isPaused ? 'APPROVED' : 'PAUSED'
+        }).catch(() => null);
+      }
+
+      setFleet(prev => 
+        prev.map(b => {
+          if (b.id === boat.id) {
+            return { 
+              ...b, 
+              status: nextStatus as any,
+              todayStatus: nextTodayStatus as any,
+              isPaused: !isPaused
+            };
+          }
+          return b;
+        })
+      );
+
+      toast.dismiss(toastId);
+      toast.success(
+        isPaused 
+          ? `Listing resumed! ${boat.name} is now Available.` 
+          : `Listing paused! ${boat.name} is now Paused/Inactive.`
+      );
+    } catch (err) {
+      toast.dismiss(toastId);
+      toast.error('Failed to update listing status.');
+    } finally {
+      setActiveDropdownId(null);
+    }
   };
 
   // Delete listing handler
@@ -454,10 +483,10 @@ export const MyFleetSection: React.FC<MyFleetSectionProps> = ({
                       </button>
                       <button 
                         type="button"
-                        onClick={() => handlePauseListing(boat.id)}
-                        className="w-full px-3 py-1.5 text-left hover:bg-slate-50 flex items-center gap-1.5 cursor-pointer text-amber-600"
+                        onClick={() => handlePauseListing(boat)}
+                        className="w-full px-3 py-1.5 text-left hover:bg-slate-50 flex items-center gap-1.5 cursor-pointer text-amber-600 font-bold"
                       >
-                        {boat.status === 'Inactive' ? 'Activate Listing' : 'Pause Listing'}
+                        {boat.status === 'Inactive' || boat.status === 'Paused' || boat.todayStatus === 'Blocked' || (boat as any).isPaused ? 'Resume Listing' : 'Pause Listing'}
                       </button>
                       <hr className="border-slate-100 my-1" />
                       <button 
@@ -484,9 +513,11 @@ export const MyFleetSection: React.FC<MyFleetSectionProps> = ({
                         ? 'bg-rose-500/80 text-white'
                       : boat.status === 'Suspended' 
                         ? 'bg-red-600/80 text-white'
+                      : boat.status === 'Inactive' || boat.status === 'Paused'
+                        ? 'bg-amber-600/80 text-white'
                         : 'bg-slate-600/80 text-white'
                   }`}>
-                    {boat.status}
+                    {boat.status === 'Inactive' || boat.status === 'Paused' ? 'PAUSED' : boat.status}
                   </span>
                   
                   <span className={`text-[8px] font-bold px-2 py-0.5 rounded-md uppercase tracking-wider backdrop-blur-md ${
