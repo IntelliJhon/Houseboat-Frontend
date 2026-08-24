@@ -1,0 +1,116 @@
+@import "tailwindcss";
+
+@custom-variant dark (&:where(.dark, .dark *));
+
+@theme {
+  /* Curated Premium Houseboat Palette */
+  --color-primary-deep: #061e38;      /* Deep Ocean Navy */
+  --color-primary-light: #0284c7;     /* Sky Blue */
+  --color-secondary-emerald: #0b664d; /* Backwater Emerald Green */
+  --color-accent-gold: #d4af37;       /* Kerala Golden Accent */
+  
+  --font-sans: 'Inter', system-ui, -apple-system, sans-serif;
+  --font-heading: 'Outfit', 'Inter', sans-serif;
+  
+  --shadow-premium: 0 10px 30px -10px rgba(6, 30, 56, 0.08), 0 1px 3px rgba(6, 30, 56, 0.02);
+  --shadow-glass: 0 8px 32px 0 rgba(31, 38, 135, 0.07);
+}
+
+/* Base custom resets and micro-interactions */
+@layer base {
+  body {
+    background-color: #fcfdfd;
+    color: #1e293b;
+    -webkit-font-smoothing: antialiased;
+    transition: background-color 0.3s ease, color 0.3s ease;
+  }
+
+  html.dark body {
+    background-color: #0b1329 !important;
+    color: #f1f5f9 !important;
+  }
+}
+
+/* Global Dark Mode Overrides for Cards, Inputs, Backgrounds, Text & Containers */
+html.dark .bg-white {
+  background-color: #131c38 !important;
+  color: #f1f5f9 !important;
+  border-color: #1e294b !important;
+}
+
+html.dark .bg-slate-50,
+html.dark .bg-slate-50\/50,
+html.dark .bg-slate-50\/70,
+html.dark .bg-slate-100,
+html.dark .bg-slate-100\/80 {
+  background-color: #1a2548 !important;
+  color: #e2e8f0 !important;
+}
+
+html.dark .border-slate-100,
+html.dark .border-slate-200,
+html.dark .border-slate-200\/60,
+html.dark .border-slate-50 {
+  border-color: #26335e !important;
+}
+
+html.dark input:not([type="checkbox"]):not([type="radio"]),
+html.dark select,
+html.dark textarea {
+  background-color: #1e2a52 !important;
+  color: #ffffff !important;
+  border-color: #334155 !important;
+}
+
+html.dark .text-slate-800,
+html.dark .text-slate-900,
+html.dark .text-slate-700,
+html.dark .text-primary-deep {
+  color: #f8fafc !important;
+}
+
+html.dark .text-slate-500,
+html.dark .text-slate-600,
+html.dark .text-slate-400 {
+  color: #94a3b8 !important;
+}
+
+html.dark .shadow-xs,
+html.dark .shadow-sm,
+html.dark .shadow-md,
+html.dark .shadow-premium {
+  box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.5) !important;
+}
+
+/* Custom premium transitions and glassmorphism helpers */
+.glassmorphism {
+  background: rgba(255, 255, 255, 0.75);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(255, 255, 255, 0.4);
+}
+
+html.dark .glassmorphism {
+  background: rgba(15, 23, 42, 0.85) !important;
+  border: 1px solid rgba(255, 255, 255, 0.1) !important;
+}
+
+.text-gradient-primary {
+  background: linear-gradient(135deg, #061e38 0%, #0284c7 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+html.dark .text-gradient-primary {
+  background: linear-gradient(135deg, #38bdf8 0%, #818cf8 100%) !important;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.hover-lift {
+  transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.3s ease;
+}
+.hover-lift:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 20px 40px -15px rgba(6, 30, 56, 0.12);
+}
