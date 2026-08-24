@@ -605,7 +605,7 @@ export const MyFleetSection: React.FC<MyFleetSectionProps> = ({
                     </button>
                   </div>
 
-                  {(boat.status === 'Rejected' || boat.status === 'Under Review' || boat.status === 'Suspended') && (
+                  {(boat.status === 'Rejected' || boat.status === 'Under Review') && (
                     <button
                       type="button"
                       onClick={() => handleResubmit(boat.id)}
